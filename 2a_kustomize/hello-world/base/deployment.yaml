@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: hw-deployment
   labels:
-    team: devops_change_base_deployment_file
+    team: devops
 spec:
   replicas: 2
   selector:
