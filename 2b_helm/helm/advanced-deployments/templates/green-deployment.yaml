@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "advanced-deployments.labels" . | nindent 8 }}
+        {{- include "advanced-deployments.selectorLabels" . | nindent 8 }}
         app: green
     spec:
       {{- with .Values.imagePullSecrets }}
