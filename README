@@ -1,0 +1,105 @@
+# kustomize
+
+
+
+# helm basics
+
+
+
+
+# helm blue green deployment (A/B switchover testing) 
+
+## intial helm install deployment to Blue
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ helm install bluegreen .
+NAME: bluegreen
+LAST DEPLOYED: Wed Jun 12 20:13:42 2024
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Get the application URL by running these commands:
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch its status by running 'kubectl get --namespace default svc -w bluegreen-advanced-deployments'
+  export SERVICE_IP=$(kubectl get svc --namespace default bluegreen-advanced-deployments --template "{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}")
+  echo http://$SERVICE_IP:80
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ kubectl get --namespace default svc -w bluegreen-advanced-deployments
+NAME                             TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+bluegreen-advanced-deployments   LoadBalancer   100.68.190.253   a7c137ed9e5324f139549061920e0c69-2130900453.us-east-1.elb.amazonaws.com   80:31142/TCP   3m28s
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ kubectl get --namespace default svc - bluegreen-advanced-deployments
+NAME                             TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+bluegreen-advanced-deployments   LoadBalancer   100.68.190.253   a7c137ed9e5324f139549061920e0c69-2130900453.us-east-1.elb.amazonaws.com   80:31142/TCP   7m28s
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ kubectl get svc
+NAME                             TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+bluegreen-advanced-deployments   LoadBalancer   100.68.190.253   a7c137ed9e5324f139549061920e0c69-2130900453.us-east-1.elb.amazonaws.com   80:31142/TCP   7m58s
+kubernetes                       ClusterIP      100.64.0.1       <none>                                                                    443/TCP        24m
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ kubectl get pods
+NAME                                                    READY   STATUS    RESTARTS   AGE
+bluegreen-advanced-deployments-blue-57dd44779b-d2w84    1/1     Running   0          8m5s
+bluegreen-advanced-deployments-green-7b7fdc6f48-72l9z   1/1     Running   0          8m5s
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ kubectl get svc -w
+NAME                             TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+bluegreen-advanced-deployments   LoadBalancer   100.68.190.253   a7c137ed9e5324f139549061920e0c69-2130900453.us-east-1.elb.amazonaws.com   80:31142/TCP   9m8s
+kubernetes                       ClusterIP      100.64.0.1       <none>                                                                    443/TCP        25m
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ helm history bluegreen
+REVISION        UPDATED                         STATUS          CHART                           APP VERSION     DESCRIPTION     
+1               Wed Jun 12 20:13:42 2024        deployed        advanced-deployments-0.1.0      1.16.0          Install complete
+
+
+
+## upgrade helm install to Green deployment with currentTarget.app setting
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ helm upgrade bluegreen --set "currentTarget.app=green" .
+Release "bluegreen" has been upgraded. Happy Helming!
+NAME: bluegreen
+LAST DEPLOYED: Wed Jun 12 20:38:38 2024
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+NOTES:
+1. Get the application URL by running these commands:
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch its status by running 'kubectl get --namespace default svc -w bluegreen-advanced-deployments'
+  export SERVICE_IP=$(kubectl get svc --namespace default bluegreen-advanced-deployments --template "{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}")
+  echo http://$SERVICE_IP:80
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ kubectl get svc
+NAME                             TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+bluegreen-advanced-deployments   LoadBalancer   100.68.190.253   a7c137ed9e5324f139549061920e0c69-2130900453.us-east-1.elb.amazonaws.com   80:31142/TCP   25m
+kubernetes                       ClusterIP      100.64.0.1       <none>                                                                    443/TCP        42m
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ kubectl get pod
+NAME                                                    READY   STATUS    RESTARTS   AGE
+bluegreen-advanced-deployments-blue-57dd44779b-d2w84    1/1     Running   0          25m
+bluegreen-advanced-deployments-green-7b7fdc6f48-72l9z   1/1     Running   0          25m
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2b_helm/helm/advanced-deployments$ helm history bluegreen
+REVISION        UPDATED                         STATUS          CHART                           APP VERSION     DESCRIPTION     
+1               Wed Jun 12 20:13:42 2024        superseded      advanced-deployments-0.1.0      1.16.0          Install complete
+2               Wed Jun 12 20:38:38 2024        deployed        advanced-deployments-0.1.0      1.16.0          Upgrade complete
+
+
+
+Browser refresh will reveal the Green deployment
+
+
+
+
+
+# kudo
+
