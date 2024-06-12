@@ -70,4 +70,5 @@ spec:
         - name: green-vol
           configMap:
             name: green
-      {{- end}}
+               
+
