@@ -70,4 +70,3 @@ spec:
         - name: blue-vol
           configMap:
             name: blue
-
