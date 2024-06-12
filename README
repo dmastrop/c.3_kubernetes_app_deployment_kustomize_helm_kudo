@@ -2,6 +2,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 # helm basics
 
 from main directory with Charts.yaml
@@ -372,6 +383,14 @@ data:
         <h1 style="color: green">Green</h1>
       </body>
     </html>
+
+
+
+
+
+
+
+
 
 
 # kudo
