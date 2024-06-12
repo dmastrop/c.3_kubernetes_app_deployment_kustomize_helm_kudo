@@ -70,7 +70,4 @@ spec:
         - name: green-vol
           configMap:
             name: green
-
-            # source code
-               
-
+            
