@@ -4,7 +4,13 @@
 
 # helm basics
 
+from main directory with Charts.yaml
 
+helm install <deployment> .
+helm delete <deployment> 
+helm history <deployment>
+helm upgrade <deployment>
+helm upgrade <deployment> --set "<variable in yaml>" .   <<< use this, for example with blue/green deployments during testing
 
 
 # helm blue green deployment (A/B switchover testing) 
