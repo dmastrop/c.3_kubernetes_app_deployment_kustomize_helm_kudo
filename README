@@ -99,6 +99,205 @@ Browser refresh will reveal the Green deployment
 
 
 
+## helm blue/green template config yaml files
+
+blue-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "advanced-deployments.fullname" . }}-blue
+  labels:
+    {{- include "advanced-deployments.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "advanced-deployments.selectorLabels" . | nindent 6 }}
+      app: blue
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "advanced-deployments.selectorLabels" . | nindent 8 }}
+        app: blue
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "advanced-deployments.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: blue-vol
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: blue-vol
+          configMap:
+            name: blue
+
+
+
+
+
+
+green-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "advanced-deployments.fullname" . }}-green
+  labels:
+    {{- include "advanced-deployments.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "advanced-deployments.selectorLabels" . | nindent 6 }}
+      app: green
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "advanced-deployments.selectorLabels" . | nindent 8 }}
+        app: green
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "advanced-deployments.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: green-vol
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: green-vol
+          configMap:
+            name: green
+
+
+
+
+
+
+blue-www.yaml ConfigMap yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blue
+data:
+  index.html: |
+    <html>
+      <head>
+        <title>Blue</title>
+      <head>
+      <body>
+        <h1 style="color: blue">Blue</h1>
+      </body>
+    </html>
+
+
+
+
+
+
+green-www.yaml ConfigMap yaml
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: green
+data:
+  index.html: |
+    <html>
+      <head>
+        <title>Green</title>
+      <head>
+      <body>
+        <h1 style="color: green">Green</h1>
+      </body>
+    </html>
 
 
 # kudo
