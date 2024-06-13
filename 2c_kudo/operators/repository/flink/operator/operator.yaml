@@ -1,0 +1,47 @@
+apiVersion: kudo.dev/v1beta1
+name: "flink"
+operatorVersion: "0.2.1"
+kudoVersion: 0.10.0
+kubernetesVersion: 1.15.0
+appVersion: 1.7.2
+maintainers:
+  - name: Fabian Baier
+    email: fabian@mesosphere.io
+  - name: Tom Runyon
+    email: runyontr@gmail.com
+url: https://zookeeper.apache.org/
+tasks:
+  - name: storage
+    kind: Apply
+    spec:
+      resources:
+        - storage.yaml
+  - name: jobmanager
+    kind: Apply
+    spec:
+      resources:
+        - jobmanager-pdb.yaml
+        - jobmanager-statefulset.yaml
+  - name: jobmanager-service
+    kind: Apply
+    spec:
+      resources:
+        - services.yaml
+  - name: taskmanager
+    kind: Apply
+    spec:
+      resources:
+        - taskmanager-deployment.yaml
+plans:
+  deploy:
+    strategy: serial
+    phases:
+      - name: flink
+        strategy: serial
+        steps:
+          - name: jobmanager
+            tasks:
+              - storage
+              - jobmanager
+              - jobmanager-service
+              - taskmanager

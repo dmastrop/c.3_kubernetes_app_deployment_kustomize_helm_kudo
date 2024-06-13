@@ -1,0 +1,63 @@
+apiVersion: kudo.dev/v1beta1
+name: "elastic"
+operatorVersion: "0.2.2"
+kudoVersion: 0.10.0
+kubernetesVersion: 1.15.0
+appVersion: 7.0.0
+maintainers:
+  - name: Michael Beisiegel
+    email: michael.beisiegel@gmail.com
+url: https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+tasks:
+  - name: deploy-master
+    kind: Apply
+    spec:
+      resources:
+        - master-service.yaml
+        - master.yaml
+  - name: deploy-data
+    kind: Apply
+    spec:
+      resources:
+        - data-service.yaml
+        - data.yaml
+  - name: deploy-coordinator
+    kind: Apply
+    spec:
+      resources:
+        - coordinator-service.yaml
+        - coordinator.yaml
+  - name: deploy-ingest
+    kind: Apply
+    spec:
+      resources:
+        - ingest-service.yaml
+        - ingest.yaml
+plans:
+  deploy:
+    strategy: serial
+    phases:
+      - name: deploy-master
+        strategy: parallel
+        steps:
+          - name: deploy-master
+            tasks:
+              - deploy-master
+      - name: deploy-data
+        strategy: parallel
+        steps:
+          - name: deploy-data
+            tasks:
+              - deploy-data
+      - name: deploy-coordinator
+        strategy: parallel
+        steps:
+          - name: deploy-coordinator
+            tasks:
+              - deploy-coordinator
+      - name: deploy-ingest
+        strategy: parallel
+        steps:
+          - name: deploy-ingest
+            tasks:
+              - deploy-ingest

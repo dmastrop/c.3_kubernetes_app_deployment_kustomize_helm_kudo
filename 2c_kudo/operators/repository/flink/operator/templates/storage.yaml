@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Name }}-snapshots
+  namespace: {{ .Namespace }}
+spec:
+  accessModes:
+    - {{ .Params.flink_storage_accessmodes }}
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Name }}-ha
+  namespace: {{ .Namespace }}
+spec:
+  accessModes:
+    - {{ .Params.flink_storage_accessmodes }}
+  resources:
+    requests:
+      storage: 1Gi

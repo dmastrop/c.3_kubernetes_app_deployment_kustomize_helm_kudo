@@ -1,0 +1,11 @@
+apiVersion: kudo.dev/v1beta1
+kind: PlanExecution
+metadata:
+  name: restart
+  namespace: default
+spec:
+  instance:
+    kind: Instance
+    name: application
+    namespace: default
+  planName: restart

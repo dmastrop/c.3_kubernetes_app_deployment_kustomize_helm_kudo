@@ -1,0 +1,5 @@
+apiVersion: kudo.dev/v1beta1
+parameters:
+  - name: download_url
+    description: URL To download the application from
+    default: "https://downloads.mesosphere.com/dcos-demo/flink/flink-job-1.0.jar"

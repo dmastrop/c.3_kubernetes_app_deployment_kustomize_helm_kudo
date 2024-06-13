@@ -1,0 +1,16 @@
+apiVersion: kudo.dev/v1beta1
+parameters:
+  - name: BACKUP_FILE
+    description: "Filename to save the backups to"
+    default: "backup.sql"
+    displayName: "BackupFile"
+    trigger: backup
+  - name: PASSWORD
+    default: "password"
+  - name: RESTORE_FILE
+    default: "backup.sql"
+    description: "Filename to restore the db from"
+    trigger: restore
+  - name: STORAGE
+    default: 1Gi
+    description: "Size of volume to store MySQL data"

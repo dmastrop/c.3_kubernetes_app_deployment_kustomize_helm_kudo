@@ -1,0 +1,36 @@
+apiVersion: kudo.dev/v1beta1
+parameters:
+  - name: DATA_NODE_COUNT
+    default: "2"
+  - name: COORDINATOR_NODE_COUNT
+    default: "1"
+  - name: INGEST_NODE_COUNT
+    default: "0"
+  - name: MASTER_CPU
+    default: "0.25"
+  - name: MASTER_MEM
+    default: "1Gi"
+  - name: MASTER_DISK
+    default: "2Gi"
+  - name: DATA_CPU
+    default: "0.25"
+  - name: DATA_MEM
+    default: "2Gi"
+  - name: DATA_DISK
+    default: "4Gi"
+  - name: COORDINATOR_CPU
+    default: "0.1"
+  - name: COORDINATOR_MEM
+    default: "1Gi"
+  - name: COORDINATOR_DISK
+    default: "2Gi"
+  - name: INGEST_CPU
+    default: "0.1"
+  - name: INGEST_MEM
+    default: "1Gi"
+  - name: INGEST_DISK
+    default: "2Gi"
+  - name: STORAGE_CLASS
+    description: "The storage class to be used in volumeClaimTemplates. By default its not required and the default storage class is used."
+    required: false
+  

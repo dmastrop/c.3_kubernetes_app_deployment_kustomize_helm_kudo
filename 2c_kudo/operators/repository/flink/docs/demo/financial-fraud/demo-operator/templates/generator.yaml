@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      generator: {{ .Name }}
+  template:
+    metadata:
+      name: flink-demo-generator
+      labels:
+        generator: {{ .Name }}
+    spec:
+      containers:
+        - name: flink-demo-generator
+          image: mesosphere/flink-generator:0.1
+          command: ["/generator-linux"]
+          imagePullPolicy: Always
+          args: ["--broker", "kafka-kafka-0.kafka-svc:9093"]
