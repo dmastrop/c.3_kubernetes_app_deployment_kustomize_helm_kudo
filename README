@@ -393,5 +393,220 @@ data:
 
 
 
-# kudo
+# kudo fundamentals
+
+kubectl kudo init --unsafe-self-signed-webhook-ca
+
+
+
+
+
+kubectl get crd
+
+ubuntu@ip-172-31-21-52:~/kudo$ kubectl get crd
+NAME                                         CREATED AT
+ciliumclusterwidenetworkpolicies.cilium.io   2024-06-13T01:11:51Z
+ciliumendpoints.cilium.io                    2024-06-13T01:11:51Z
+ciliumexternalworkloads.cilium.io            2024-06-13T01:11:51Z
+ciliumidentities.cilium.io                   2024-06-13T01:11:51Z
+ciliumnetworkpolicies.cilium.io              2024-06-13T01:11:51Z
+ciliumnodes.cilium.io                        2024-06-13T01:11:51Z
+instances.kudo.dev                           2024-06-13T01:29:03Z
+operators.kudo.dev                           2024-06-13T01:29:03Z
+operatorversions.kudo.dev                    2024-06-13T01:29:03Z
+
+
+
+
+
+Clone the github repository for all the operators
+For example, git clone https://github.com/kudobuilder/operators.git
+For mysql
+kubctl kudo install ./repository.mysql/operator
+
+│   ├── mysql
+│   │   └── operator
+│   │       ├── operator.yaml
+│   │       ├── params.yaml
+│   │       └── templates
+│   │           ├── backup-pv.yaml
+│   │           ├── backup.yaml
+│   │           ├── init.yaml
+│   │           ├── mysql.yaml
+│   │           └── restore.yaml
+
+
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2c_kudo/operators$ kubectl kudo install ./repository/mysql/operator
+
+
+operator default/mysql created
+operatorversion default/mysql-5.7-0.3.0 created
+instance default/mysql-instance created
+
+
+$ kubectl get operators
+NAME    AGE
+mysql   5m49s
+
+$ kubectl get operatorversion
+NAME              AGE
+mysql-5.7-0.3.0   6m36s
+
+$ kubectl get instances
+NAME             AGE
+mysql-instance   6m46s
+
+$ kubectl get pods
+NAME                              READY   STATUS    RESTARTS   AGE
+mysql-instance-84ff5df6fd-cbkrx   1/1     Running   0          7m45s
+
+$ kubectl get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+mysql-instance   1/1     1            1           8m58s
+
+$ kubectl get pvc
+NAME                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS    AGE
+mysql-instance-pv   Bound    pvc-8f02ba58-7f03-4c26-8cd6-f0b12fe528ba   1Gi        RWO            kops-ssd-1-17   9m43s
+
+$ kubectl get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                       STORAGECLASS    REASON   AGE
+pvc-8f02ba58-7f03-4c26-8cd6-f0b12fe528ba   1Gi        RWO            Delete           Bound    default/mysql-instance-pv   kops-ssd-1-17            9m54s
+
+
+
+## mysql commands to test backup and  restore for example: first Backup
+
+
+$ kubectl kudo plan trigger --name backup --instance mysql-instance
+ 
+ terminal into the pod
+ kubectl exec -it mysql-instance-84ff5df6fd-cbkrx -- mysql -p
+
+ mysql> show databases;
+
+ mysql> use kudo;
+
+ mysql> show tables;
+ +----------------+
+ | Tables_in_kudo |
+ +----------------+
+ | example        |
+ +----------------+
+ 1 row in set (0.00 sec)
+ 
+
+ It is an empty database
+ 
+ 
+ mysql> select * from example;
+ Empty set (0.00 sec)
+ 
+mysql> drop table example;
+Query OK, 0 rows affected (0.01 sec)
+
+
+mysql> use kudo;
+Database changed
+mysql> show tables;
+Empty set (0.00 sec)
+
+
+Examples has been removed
+
+
+## Restore
+
+$ kubectl kudo plan trigger --name restore --instance mysql-instance
+
+$ kubectl exec -it mysql-instance-84ff5df6fd-cbkrx -- mysql -p
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| kudo               |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.01 sec)
+
+
+mysql> use kudo;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+
+
+mysql> show tables;
++----------------+
+| Tables_in_kudo |
++----------------+
+| example        |
++----------------+
+1 row in set (0.00 sec)
+
+
+
+
+## uninstall the mysql operator
+
+$ kubectl kudo uninstall --instance mysql-instance
+instance.kudo.dev/v1beta1/mysql-instance deleted
+
+
+$ kubectl get pvc
+No resources found in default namespace.
+
+
+$ kubectl get pv
+No resources found
+
+
+$ kubectl get pods
+No resources found in default namespace.
+
+
+ ## Note that the operator itself is still present and installed.  Just the instance has been removed
+
+$ kubectl get operator
+NAME    AGE
+mysql   60m
+
+
+$ kubectl get operatorversion
+NAME              AGE
+mysql-5.7-0.3.0   64m
+
+
+$ kubectl get instances
+No resources found in default namespace.
+
+
+
+
+
+
+
+
+
+
+# Creating (building) own Kudo operator for nginx day-2 operations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
