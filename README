@@ -436,7 +436,8 @@ kubctl kudo install ./repository.mysql/operator
 │   │           └── restore.yaml
 
 
-ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2c_kudo/operators$ kubectl kudo install ./repository/mysql/operator
+ubuntu@ip-172-31-21-52:~/course3_projects/kubernetes_app_deployment_kustomize_helm_kudo/2c_kudo/operators$ 
+kubectl kudo install ./repository/mysql/operator
 
 
 operator default/mysql created
